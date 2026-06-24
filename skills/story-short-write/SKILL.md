@@ -412,24 +412,25 @@ novels/
 
 ### Phase 4：精修打磨
 
-加载 `references/writing-workflow.md` 中的精修清单完成检查。
+加载 `references/writing-workflow.md` 中的精修清单完成检查。正文完成后默认自动进入 `story-review full`；审查报告中的 S1-S4 修复项必须自动处理，修复完成后再复审一次，然后停止。`story-review` 是协调器，内部会按模式调用多个 reviewer agent，不是单个检查脚本。
 重点：开头钩子、情绪曲线、反转铺垫、每句话价值、格式规范、AI 腔排查。文件模式必须先运行 `node scripts/normalize-punctuation.js 正文.md`，再运行 `node scripts/check-ai-patterns.js --check 正文.md`；后者只报告不改写，命中时回到正文改掉并复扫到 0。
 
-#### Agent 调用：narrative-writer（去AI味）+ consistency-checker
+#### 自动审查闭环
+
+1. 正文写完后自动触发 `story-review full`。
+2. 读取 `story-review` 的实际 `VERDICT` 与 `FINDINGS`，把所有 S1-S4 finding 视为修复任务。
+3. 事实/一致性/规则边界类问题交给 `consistency-checker` 驱动修复；文字质量、AI 味、格式类问题交给 `narrative-writer` 驱动修复。
+4. 修复完成后再跑一次 `story-review full`。
+5. 第二次复审后停止；如果仍有 S1-S4 残留，只汇报，不再继续自动迭代。
+
+#### Agent 调用：narrative-writer（去AI味）+ consistency-checker + story-review
 
 精修阶段，如果项目已部署对应 agent，可 spawn：
-- `Agent(subagent_type: "narrative-writer", prompt: "项目目录：novels/{短篇标题}\n任务描述：去AI味+格式检查\n检查范围：{正文文件}\n必须检查：先否定再肯定的翻转句式；发现后直接改成后项或动作细节")` — 执行去AI味（7 Gate）和格式合规检查
-- `Agent(subagent_type: "consistency-checker", prompt: "项目目录：novels/{短篇标题}\n检查范围：{正文文件}\n检查类型：事实冲突+伏笔断线+角色属性不一致")` — 执行一致性检查
+- `story-review full`：自动多视角审查，生成 S1-S4 findings，并驱动后续修复闭环
+- `Agent(subagent_type: "narrative-writer", prompt: "项目目录：novels/{短篇标题}\n任务描述：去AI味+格式检查\n检查范围：{正文文件}\n必须检查：先否定再肯定的翻转句式；发现后直接改成后项或动作细节")` — 负责修正文风、AI 味和格式问题
+- `Agent(subagent_type: "consistency-checker", prompt: "项目目录：novels/{短篇标题}\n检查范围：{正文文件}\n检查类型：事实冲突+伏笔断线+角色属性不一致")` — 负责修复事实一致性问题
 
-如 agent 不可用，由主线程直接执行。
-
-**正文洁净规则**：
-- 自检（字数统计、禁用词扫描、格式检查）是过程动作，结果直接在对话里说明，不落盘成文件
-- **绝对不能**把自检记录附加到正文文件末尾
-- 正文中不得出现任何 `<!-- 自检 -->` 或类似的检查标记注释
-
-不通过 → 回退补足。
-
+如 agent 不可用，由主线程直接执行上述审查闭环。
 ---
 
 ## 流程衔接
@@ -440,7 +441,8 @@ novels/
 | 时机 | 跳转到 | 命令 |
 |---|---|---|
 | 有参考小说想对标 | story-short-analyze | `/story-short-analyze` → 输出存入 `拆文库/{书名}/` |
-| 写完，去 AI 味 | story-deslop | `/story-deslop` |
+| 正文完成后自动审查 | story-review | `/story-review full` → 多视角审查、S1-S4 修复闭环、复审后停止 |
+| 写完，去 AI 味 | story-deslop | /story-deslop |
 | 想自检 | 本 skill 质量自检 | 用 Phase 4 自检流程 + `references/quality-checklist.md` 逐项核对 |
 | 需要市场方向 | story-short-scan | `/story-short-scan` |
 | 设定太大，适合长篇 | story-long-write | `/story-long-write` |
