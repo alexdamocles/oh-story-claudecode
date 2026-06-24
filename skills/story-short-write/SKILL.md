@@ -413,22 +413,22 @@ novels/
 
 ### Phase 4：精修打磨
 
-加载 `references/writing-workflow.md` 中的精修清单完成检查。正文完成后默认自动进入 `story-review full`；第一次审查结束后必须读取审查报告中的全部 S1-S4 finding 并自动修复，不得停在“已发现问题”状态等待用户。修复完成后必须再跑一次 `story-review full` 复审；第二次审查结束后立即停止自动流程，并在最终回复末尾单独输出一行 `7777777` 作为完结信号，供 uploader 的 watchdog 判断“小说 + 审查闭环已完成”。`story-review` 是协调器，内部会按模式调用多个 reviewer agent，不是单个检查脚本。
+加载 `references/writing-workflow.md` 中的精修清单完成检查。正文完成后默认自动进入 `story-review solo`；第一次审查结束后必须读取审查报告中的全部 S1-S4 finding 并自动修复，不得停在“已发现问题”状态等待用户。修复完成后必须再跑一次 `story-review solo` 复审；第二次审查结束后立即停止自动流程，并在最终回复末尾单独输出一行 `7777777` 作为完结信号，供 uploader 的 watchdog 判断“小说 + 审查闭环已完成”。自动闭环默认使用串行审查，避免多 agent 并发带来的会话报错；只有用户手动明确要求 `story-review full` 或 `story-review lean` 时，才启用多 reviewer agent。`story-review` 是协调器，不是单个检查脚本。
 重点：开头钩子、情绪曲线、反转铺垫、每句话价值、格式规范、AI 腔排查。文件模式必须先运行 `node scripts/normalize-punctuation.js 正文.md`，再运行 `node scripts/check-ai-patterns.js --check 正文.md`；后者只报告不改写，命中时回到正文改掉并复扫到 0。
 
 #### 自动审查闭环
 
-1. 正文写完后自动触发 `story-review full`，进行多角色审查。
+1. 正文写完后自动触发 `story-review solo`，进行串行审查。
 2. 读取 `story-review` 的实际 `VERDICT` 与 `FINDINGS`，把所有 S1-S4 finding 视为修复任务。
 3. 根据审查结果，S1-S4 全部都要进入修复；结构/平台/钩子类问题交给 `story-architect`，角色/对话类问题交给 `character-designer`，文字质量/AI 味/格式类问题交给 `narrative-writer`，事实一致性/规则边界/伏笔类问题交给 `consistency-checker`。不得只回复“修复所有检查出的问题”，而不实际逐项落到对应文件。
-4. 修复完成后再跑一次 `story-review full`，再次进行多角色审查。
+4. 修复完成后再跑一次 `story-review solo`，再次进行串行审查。
 5. 第二次 `story-review` 完成后立即停止自动流程；如果仍有 S1-S4 残留，只汇报，不再继续自动迭代。
 6. 第二次 `story-review` 的最终回复末尾必须单独输出一行 `7777777`；前后不要拼接解释文字，不要加标点，不要写成段内文本，避免 watchdog 误判。
 
 #### Agent 调用：story-review + story-architect + character-designer + narrative-writer + consistency-checker
 
 精修阶段，如果项目已部署对应 agent，可 spawn：
-- `story-review full`：默认自动多角色审查模式，调用 `story-architect`、`character-designer`、`narrative-writer`、`consistency-checker` 生成 S1-S4 findings，并驱动修复闭环
+- `story-review solo`：默认自动串行审查模式，不拉多 agent，由当前会话生成 S1-S4 findings 并驱动修复闭环
 - `Agent(subagent_type: "narrative-writer", prompt: "项目目录：novels/{短篇标题}\n任务描述：去AI味+格式检查\n检查范围：{正文文件}\n必须检查：先否定再肯定的翻转句式；发现后直接改成后项或动作细节")` — 负责修正文风、AI 味和格式问题
 - `Agent(subagent_type: "consistency-checker", prompt: "项目目录：novels/{短篇标题}\n检查范围：{正文文件}\n检查类型：事实冲突+伏笔断线+角色属性不一致")` — 负责修复事实一致性问题
 
@@ -443,7 +443,7 @@ novels/
 | 时机 | 跳转到 | 命令 |
 |---|---|---|
 | 有参考小说想对标 | story-short-analyze | `/story-short-analyze` → 输出存入 `拆文库/{书名}/` |
-| 正文完成后自动审查 | story-review | `/story-review full` → 多角色审查、S1-S4 修复闭环、复审后停止 |
+| 正文完成后自动审查 | story-review | `/story-review solo` → 串行审查、S1-S4 修复闭环、复审后停止 |
 | 写完，去 AI 味 | story-deslop | /story-deslop |
 | 想自检 | 本 skill 质量自检 | 用 Phase 4 自检流程 + `references/quality-checklist.md` 逐项核对 |
 | 需要市场方向 | story-short-scan | `/story-short-scan` |

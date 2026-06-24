@@ -19,16 +19,16 @@ metadata:
 
 ## Review Mode 选择
 
-- `/story-review` 或 `/story-review full` → 优先 spawn 全部 4 个 Agent；如果当前已经在子代理内，核心 Agent 未部署/异常，或 spawn 失败，自动降级为 solo。
+- `/story-review` 或 `/story-review solo` → 不 spawn Agent，由当前会话执行基础审查。
+- `/story-review full` → 优先 spawn 全部 4 个 Agent；如果当前已经在子代理内，核心 Agent 未部署/异常，或 spawn 失败，自动降级为 solo。
 - `/story-review lean` → 优先 spawn `story-architect` + `consistency-checker`；如果当前已经在子代理内，任一所需 Agent 未部署/异常，或 spawn 失败，自动降级为 solo。
 - `/story-review solo` → 不 spawn Agent，由当前会话执行基础审查。
-- 未指定 → 默认 full，并在报告里写明最终实际执行模式。
-
+- 未指定 → 默认 solo，并在报告里写明最终实际执行模式。
 ---
 
 ## Phase 0：预检与降级（必须先执行）
 
-1. **确定请求模式**：解析用户输入中的 `full`、`lean`、`solo`；未指定时目标模式为 `full`。
+1. **确定请求模式**：解析用户输入中的 `full`、`lean`、`solo`；未指定时目标模式为 `solo`。
 2. **确认是否允许 spawn**：如果当前已经在子代理/Agent 内执行，不再递归 spawn，直接降级为 `solo`。
 3. **检查核心 Agent 部署状态**（检查项目内 agents，同时兼容 Claude Code 和 OpenCode）：
    - 优先检查 `.claude/agents/`，其次检查 `.opencode/agents/`；两个目录任一存在即视为已部署
