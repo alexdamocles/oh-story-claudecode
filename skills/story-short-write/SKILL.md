@@ -413,16 +413,17 @@ novels/
 
 ### Phase 4：精修打磨
 
-加载 `references/writing-workflow.md` 中的精修清单完成检查。正文完成后默认自动进入 `story-review full`；审查报告中的 S1-S4 修复项必须自动处理，修复完成后再复审一次，然后停止。`story-review` 是协调器，内部会按模式调用多个 reviewer agent，不是单个检查脚本。
+加载 `references/writing-workflow.md` 中的精修清单完成检查。正文完成后默认自动进入 `story-review full`；第一次审查结束后必须读取审查报告中的全部 S1-S4 finding 并自动修复，不得停在“已发现问题”状态等待用户。修复完成后必须再跑一次 `story-review full` 复审；第二次审查结束后立即停止自动流程，并在最终回复末尾单独输出一行 `7777777` 作为完结信号，供 uploader 的 watchdog 判断“小说 + 审查闭环已完成”。`story-review` 是协调器，内部会按模式调用多个 reviewer agent，不是单个检查脚本。
 重点：开头钩子、情绪曲线、反转铺垫、每句话价值、格式规范、AI 腔排查。文件模式必须先运行 `node scripts/normalize-punctuation.js 正文.md`，再运行 `node scripts/check-ai-patterns.js --check 正文.md`；后者只报告不改写，命中时回到正文改掉并复扫到 0。
 
 #### 自动审查闭环
 
 1. 正文写完后自动触发 `story-review full`，进行多角色审查。
 2. 读取 `story-review` 的实际 `VERDICT` 与 `FINDINGS`，把所有 S1-S4 finding 视为修复任务。
-3. 根据审查结果，S1-S4 全部都要进入修复；结构/平台/钩子类问题交给 `story-architect`，角色/对话类问题交给 `character-designer`，文字质量/AI 味/格式类问题交给 `narrative-writer`，事实一致性/规则边界/伏笔类问题交给 `consistency-checker`。
+3. 根据审查结果，S1-S4 全部都要进入修复；结构/平台/钩子类问题交给 `story-architect`，角色/对话类问题交给 `character-designer`，文字质量/AI 味/格式类问题交给 `narrative-writer`，事实一致性/规则边界/伏笔类问题交给 `consistency-checker`。不得只回复“修复所有检查出的问题”，而不实际逐项落到对应文件。
 4. 修复完成后再跑一次 `story-review full`，再次进行多角色审查。
 5. 第二次 `story-review` 完成后立即停止自动流程；如果仍有 S1-S4 残留，只汇报，不再继续自动迭代。
+6. 第二次 `story-review` 的最终回复末尾必须单独输出一行 `7777777`；前后不要拼接解释文字，不要加标点，不要写成段内文本，避免 watchdog 误判。
 
 #### Agent 调用：story-review + story-architect + character-designer + narrative-writer + consistency-checker
 
@@ -512,3 +513,4 @@ novels/
 
 - 跟随用户的语言回复，用户用什么语言就用什么语言回复
 - 中文回复遵循《中文文案排版指北》
+
