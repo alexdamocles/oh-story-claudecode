@@ -413,26 +413,17 @@ novels/
 
 ### Phase 4：精修打磨
 
-加载 `references/writing-workflow.md` 中的精修清单完成检查。正文完成后默认自动进入 `story-review solo`；第一次审查结束后必须读取审查报告中的全部 S1-S4 finding 并自动修复，不得停在“已发现问题”状态等待用户。修复完成后必须再跑一次 `story-review solo` 复审；第二次审查结束后立即停止自动流程，并在最终回复末尾单独输出一行 `7777777` 作为完结信号，供 uploader 的 watchdog 判断“小说 + 审查闭环已完成”。自动闭环默认使用串行审查，避免多 agent 并发带来的会话报错；只有用户手动明确要求 `story-review full` 或 `story-review lean` 时，才启用多 reviewer agent。`story-review` 是协调器，不是单个检查脚本。
+加载 `references/writing-workflow.md` 中的精修清单完成检查。正文完成后不要自动进入 `story-review`；先立即停止当前写作流程，并在最终回复末尾单独输出一行 `6666666` 作为正文完结信号，供局域网 watchdog 判断“正文已完成、等待压缩上下文与审文指令”。收到 watchdog 后续明确发来的压缩上下文或开始审文指令前，不得自行触发 `story-review solo`、`story-review full`、`story-review lean` 或任何自动审文闭环。`story-review` 是协调器，不是单个检查脚本。
 重点：开头钩子、情绪曲线、反转铺垫、每句话价值、格式规范、AI 腔排查。文件模式必须先运行 `node scripts/normalize-punctuation.js 正文.md`，再运行 `node scripts/check-ai-patterns.js --check 正文.md`；后者只报告不改写，命中时回到正文改掉并复扫到 0。
 
-#### 自动审查闭环
+#### 正文完成后交接
 
-1. 正文写完后自动触发 `story-review solo`，进行串行审查。
-2. 读取 `story-review` 的实际 `VERDICT` 与 `FINDINGS`，把所有 S1-S4 finding 视为修复任务。
-3. 根据审查结果，S1-S4 全部都要进入修复；默认由当前主会话按审查报告顺序串行修复，逐项实际修改对应文件。自动闭环阶段禁止默认 spawn 修复 agent；只有用户明确要求“用 agent 修复”或“并行修复”时，才允许按问题类型调用对应 agent。不得只回复“修复所有检查出的问题”，而不实际逐项落到对应文件。
-4. 修复完成后再跑一次 `story-review solo`，再次进行串行审查。
-5. 第二次 `story-review` 完成后立即停止自动流程；如果仍有 S1-S4 残留，只汇报，不再继续自动迭代。
-6. 第二次 `story-review` 的最终回复末尾必须单独输出一行 `7777777`；前后不要拼接解释文字，不要加标点，不要写成段内文本，避免 watchdog 误判。
+1. 正文、设定、大纲及必要的格式整理完成后，立即停止当前写作流程，不得自动触发 `story-review`。
+2. 最终回复末尾必须单独输出一行 `6666666`；前后不要拼接解释文字，不要加标点，不要写成段内文本，避免 watchdog 误判。
+3. 输出 `6666666` 后，视为控制权交给局域网 watchdog；等待其发送压缩上下文指令与开始审文指令。
+4. 在 watchdog 明确下发后续指令前，不得自行进入 `story-review solo`、`story-review full`、`story-review lean`，也不得默认开启任何审后修复闭环。
+5. 如用户后续或 watchdog 明确要求开始审文，再按对应指令进入审文流程。
 
-#### 自动审后修复执行方式
-
-- `story-review solo`：默认自动串行审查模式，不拉多 agent，由当前会话生成 S1-S4 findings 并驱动修复闭环。
-- 审查完成后，当前主会话必须读取对应小说目录中的审查报告与实际 findings，按顺序串行修复正文、设定、大纲等相关文件。
-- 自动闭环默认只允许主会话直接修文，不默认调用 `story-architect`、`character-designer`、`narrative-writer`、`consistency-checker` 等修复 agent。
-- 只有用户明确要求使用 agent 修复、并行修复或专项外包修复时，才允许按问题类型调用对应 agent。
-- 如 agent 不可用或调用失败，不得中断闭环；直接回退为主线程串行修复并继续后续复审。
----
 
 ## 流程衔接
 
@@ -442,7 +433,7 @@ novels/
 | 时机 | 跳转到 | 命令 |
 |---|---|---|
 | 有参考小说想对标 | story-short-analyze | `/story-short-analyze` → 输出存入 `拆文库/{书名}/` |
-| 正文完成后自动审查 | story-review | `/story-review solo` → 串行审查、S1-S4 修复闭环、复审后停止 |
+| 正文完成后交给 watchdog | story-review | 输出 `6666666` → 等待压缩上下文与后续审文指令 |
 | 写完，去 AI 味 | story-deslop | /story-deslop |
 | 想自检 | 本 skill 质量自检 | 用 Phase 4 自检流程 + `references/quality-checklist.md` 逐项核对 |
 | 需要市场方向 | story-short-scan | `/story-short-scan` |
