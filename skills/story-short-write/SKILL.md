@@ -420,19 +420,18 @@ novels/
 
 1. 正文写完后自动触发 `story-review solo`，进行串行审查。
 2. 读取 `story-review` 的实际 `VERDICT` 与 `FINDINGS`，把所有 S1-S4 finding 视为修复任务。
-3. 根据审查结果，S1-S4 全部都要进入修复；结构/平台/钩子类问题交给 `story-architect`，角色/对话类问题交给 `character-designer`，文字质量/AI 味/格式类问题交给 `narrative-writer`，事实一致性/规则边界/伏笔类问题交给 `consistency-checker`。不得只回复“修复所有检查出的问题”，而不实际逐项落到对应文件。
+3. 根据审查结果，S1-S4 全部都要进入修复；默认由当前主会话按审查报告顺序串行修复，逐项实际修改对应文件。自动闭环阶段禁止默认 spawn 修复 agent；只有用户明确要求“用 agent 修复”或“并行修复”时，才允许按问题类型调用对应 agent。不得只回复“修复所有检查出的问题”，而不实际逐项落到对应文件。
 4. 修复完成后再跑一次 `story-review solo`，再次进行串行审查。
 5. 第二次 `story-review` 完成后立即停止自动流程；如果仍有 S1-S4 残留，只汇报，不再继续自动迭代。
 6. 第二次 `story-review` 的最终回复末尾必须单独输出一行 `7777777`；前后不要拼接解释文字，不要加标点，不要写成段内文本，避免 watchdog 误判。
 
-#### Agent 调用：story-review + story-architect + character-designer + narrative-writer + consistency-checker
+#### 自动审后修复执行方式
 
-精修阶段，如果项目已部署对应 agent，可 spawn：
-- `story-review solo`：默认自动串行审查模式，不拉多 agent，由当前会话生成 S1-S4 findings 并驱动修复闭环
-- `Agent(subagent_type: "narrative-writer", prompt: "项目目录：novels/{短篇标题}\n任务描述：去AI味+格式检查\n检查范围：{正文文件}\n必须检查：先否定再肯定的翻转句式；发现后直接改成后项或动作细节")` — 负责修正文风、AI 味和格式问题
-- `Agent(subagent_type: "consistency-checker", prompt: "项目目录：novels/{短篇标题}\n检查范围：{正文文件}\n检查类型：事实冲突+伏笔断线+角色属性不一致")` — 负责修复事实一致性问题
-
-如 agent 不可用，由主线程直接执行上述审查闭环。
+- `story-review solo`：默认自动串行审查模式，不拉多 agent，由当前会话生成 S1-S4 findings 并驱动修复闭环。
+- 审查完成后，当前主会话必须读取对应小说目录中的审查报告与实际 findings，按顺序串行修复正文、设定、大纲等相关文件。
+- 自动闭环默认只允许主会话直接修文，不默认调用 `story-architect`、`character-designer`、`narrative-writer`、`consistency-checker` 等修复 agent。
+- 只有用户明确要求使用 agent 修复、并行修复或专项外包修复时，才允许按问题类型调用对应 agent。
+- 如 agent 不可用或调用失败，不得中断闭环；直接回退为主线程串行修复并继续后续复审。
 ---
 
 ## 流程衔接
