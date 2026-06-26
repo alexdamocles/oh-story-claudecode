@@ -38,7 +38,7 @@
 
 | 综合情况 | Verdict |
 |---|---|
-| 无 S1/S2，S3 可快速处理 | APPROVE |
+| 无 S1/S2/S3，且仅剩 S4 或无问题 | APPROVE |
 | 有 S2，或 S3 数量多影响阅读 | CONCERNS |
 | 有 S1，或核心卖点/动机/规则崩坏 | REJECT |
 
