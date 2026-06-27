@@ -205,8 +205,9 @@ check_skill() {
     while IFS= read -r ref_name; do
       [ -z "$ref_name" ] && continue
       # Skip template placeholders and non-ASCII paths (artifact templates)
-      [[ "$ref_name" == *"{"* ]] && continue
-      [[ "$ref_name" =~ [^[:ascii:]] ]] && continue
+      # Skip template placeholders and non-ASCII paths (artifact templates).
+      # `[:ascii:]` is not portable across the bash variants used in CI/Git Bash.
+      printf '%s' "$ref_name" | LC_ALL=C grep -q '[^ -~]' && continue
       # Only check filenames that look like reference docs (lowercase ASCII + hyphens + underscores)
       local base_name="$(basename "$ref_name")"
       [[ "$base_name" =~ ^[a-z0-9_-]+\.md$ ]] || continue
