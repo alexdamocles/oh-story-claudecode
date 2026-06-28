@@ -372,6 +372,12 @@ node scripts/check-ai-patterns.js --check <正文文件...>
 2. 全文上限 3 轮重扫；第 3 轮仍有 ≥10 处改动 → 在报告里标 `[需复核]`，移交人工
 3. 每轮结束前都要做一遍"再检一次"：是否有不符合的地方，有则继续；没有则停
 
+**审查闭环边界**：
+- `story-deslop` 只负责正文去 AI 味与去 AI 味润色报告，不得修改、生成或覆盖 `审查报告_*.md` / `最终审查报告.md`。
+- 不得把 `VERDICT: CONCERNS`、`VERDICT: REJECT` 或任何审查结论改写为 `VERDICT: APPROVE`；审查结论只能由 `/story-review` 在重新审查正文后产生。
+- 完成去 AI 味修复后，只报告“已按报告修复，等待重新审查”，不得输出 `7777777`，也不得提示用户“通过 `/story-short-write` 输出 `7777777`”。
+- 如果本次去 AI 味由 `/story-review` 的 `CONCERNS` / `REJECT` 触发，完成后应把控制权交回 `/story-review` 复审，而不是自行宣告审文通过。
+
 ---
 
 ## 使用场景

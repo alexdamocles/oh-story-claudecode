@@ -409,6 +409,7 @@ novels/
 3. 输出 `6666666` 后，视为控制权交给局域网 watchdog；等待其发送压缩上下文指令与开始审文指令。
 4. 在 watchdog 明确下发后续指令前，不得自行进入 `story-review solo`、`story-review full`、`story-review lean`，也不得默认开启任何审后修复闭环。
 5. 如用户后续或 watchdog 明确要求开始审文，再按对应指令进入审文流程。
+6. `story-short-write` 不负责审文通过信号；不得因用户、`story-review` 或 `story-deslop` 提示而单独输出 `7777777`。`7777777` 只能由 `/story-review` 在本轮 `VERDICT: APPROVE` 且已写出 `最终审查报告.md` 后输出。
 
 
 ## 流程衔接
@@ -489,5 +490,3 @@ novels/
 
 - 跟随用户的语言回复，用户用什么语言就用什么语言回复
 - 中文回复遵循《中文文案排版指北》
-
-
