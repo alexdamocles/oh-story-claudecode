@@ -355,6 +355,12 @@ Rubric Source: file | embedded fallback
 ## 综合评定
 APPROVE(通过) / CONCERNS(有问题) / REJECT(需重写)
 
+## REVIEW_RESULT
+VERDICT: APPROVE / CONCERNS / REJECT / NOT_RUN
+REASON: {一句话中文结论；必须明确写通过/需修改/重写原因，不得留空}
+REPORT_FILE: {审查报告_1.md / 审查报告_2.md / 最终审查报告.md}
+## END_REVIEW_RESULT
+
 ## 发现的问题
 {按统一 Findings Schema 或等价表格列出所有问题}
 
@@ -443,7 +449,7 @@ Rubric Source: file | embedded fallback
 
 ## 报告落盘约束
 
-- 每次 `/story-review` 结束前，必须确认审查报告已经写入当前小说目录。
+- 每次 `/story-review` 结束前，必须确认审查报告已经写入当前小说目录。`审查报告_*.md` / `最终审查报告.md` 中必须包含完整的 `REVIEW_RESULT` 机器可读结果块：`VERDICT`、`REASON`、`REPORT_FILE` 三行都不得省略。
 - 如果无法确定当前小说目录，先根据 `正文.md`、`设定.md`、`小节大纲.md` 的所在目录反推；仍无法确定时，再在终端里明确报告“未能定位小说目录，因此未落盘”。
 - 上游若是 `story-short-write` 自动闭环：
   - 第一次审查写 `审查报告_1.md`
