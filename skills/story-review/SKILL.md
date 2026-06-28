@@ -449,7 +449,8 @@ Rubric Source: file | embedded fallback
   - 第一次审查写 `审查报告_1.md`
   - 后续复审如 `VERDICT` 仍为 `CONCERNS` 或 `REJECT`，继续顺延写 `审查报告_2.md`、`审查报告_3.md`……，不得写 `最终审查报告.md`
   - 只有当前轮 `VERDICT: APPROVE` 时，才允许写 `最终审查报告.md`
-  - 只有写出 `最终审查报告.md` 的这一轮，`story-review` 才允许在最终回复末尾单独输出一行 `7777777` 作为审文通过完结信号；未 `APPROVE` 时不得输出 `7777777`
+  - 只有写出 `最终审查报告.md` 的这一轮，`story-review` 才允许输出审文通过完结信号；未 `APPROVE` 时不得输出 `7777777`
+  - 触发完结信号时，最终回复只能包含一行 `7777777`；不得在同一条回复里写修复摘要、报告路径、`VERDICT` 变化说明、`APPROVE`、`CONCERNS`、`REJECT` 或任何解释文字
   - 不得提示用户或 watchdog “通过 `/story-short-write` 输出 `7777777`”；`story-short-write` 的职责到正文完成信号 `6666666` 为止，审文通过信号由 `story-review` 负责输出
   - `7777777` 必须独立成行，前后不要拼接解释文字、标点或命令，避免 uploader/watchdog 误判
 
