@@ -309,12 +309,29 @@ novels/
 
 正文默认按 2-3 节/批串行推进，并优先交给 `narrative-writer` 直接落盘。主会话只负责编排批次、传递文件路径和当前目标、运行机器检查、验收摘要；不得要求子代理把正文返回对话，也不得把整篇 `正文.md` 重新读入主上下文。
 
-1. 主会话确定本批节号，并检查当前 agent 注册表以及 `.claude/agents/narrative-writer.md`、`.opencode/agents/narrative-writer.md`；任一路径确认 `narrative-writer` 已注册且调用能力可用时，spawn `Agent(subagent_type: "narrative-writer")`。
-2. 每次只允许一个写作 agent 修改 `正文.md`，禁止并发写同一小说。首批可创建正文；后续批次只能追加或定点修改本批内容，不得重写已经验收的小节。
-3. prompt 只传项目路径、目标节号、设定/大纲/摘要/正文路径和硬约束，不粘贴全文。要求 agent 自行读取 `设定.md`、`小节大纲.md`、`已写小节摘要.md` 及 `正文.md` 尾部 300-500 字。
-4. agent 写完后必须直接更新 `正文.md`，并覆盖更新 `已写小节摘要.md`（3-5 条：本批节号、已揭示信息、情绪位置、状态变化、未回收伏笔、下一批衔接句）；只向主会话返回不超过 200 字的落盘摘要。
-5. 主会话只读取该摘要、更新后的 `已写小节摘要.md` 和正文尾部 300-500 字，再执行节号、字数、格式和 AI 句式检查。需要返修时，只把问题清单和文件路径发给 agent，不回传整段正文。
-6. `narrative-writer` 文件不存在、当前会话尚未注册该 subagent、调用失败，或用户明确要求主会话写作时，才回退为主会话按相同批次与验收规则直接写正文。
+1. 主会话确定本批节号后，先检查当前会话实际公开的工具名，再按运行时分支调用。不得用 `.claude/agents/narrative-writer.md` 文件存在代替“子代理工具可用”的判断，也不得只在文字中声称“准备调用”；必须出现真实工具调用及成功返回。
+2. **OpenClaw 分支**：当前工具包含 `sessions_spawn` 时，必须优先调用它，不得调用 Claude Code 的 `Agent(...)`。`.claude/agents/narrative-writer.md` 只是子会话要读取的角色契约，不等于 OpenClaw `agentId` 已注册。调用格式固定为：
+
+   ```text
+   sessions_spawn({
+     task: "先读取 .claude/agents/narrative-writer.md 作为角色与质量契约，再按下方调用 prompt 直接完成本批正文落盘；不要把正文返回父会话。",
+     taskName: "narrative_writer_{起始节}_{结束节}",
+     runtime: "subagent",
+     mode: "run",
+     cwd: "{项目根绝对路径}",
+     context: "isolated",
+     cleanup: "keep"
+   })
+   ```
+
+   将下方“调用 prompt”的全部字段并入 `task`。默认省略 `agentId`，让 OpenClaw 使用当前允许的子代理；只有 `agents_list` 明确列出 `narrative-writer` 时才传 `agentId: "narrative-writer"`。若返回“必须提供 agentId”，先调用 `agents_list`，选择允许的当前/默认 agentId 后用同一 task 重试一次。
+3. **Claude Code / OpenCode 分支**：当前工具包含 `Agent` 且 custom agent 注册表中存在 `narrative-writer` 时，调用 `Agent(subagent_type: "narrative-writer", prompt: "{下方调用 prompt}")`。仅有定义文件、但当前工具或注册表没有该 subagent_type，不算可调用。
+4. `sessions_spawn` 返回 accepted 或 `Agent` 调用开始后，父会话立即停止本批正文生成，等待子会话完成；等待期间不得自行写同一批。恢复、超时或上下文压缩后，先检查本批对应子会话/落盘结果；没有真实子会话且未落盘时重新执行本运行时分支，不得直接降级主会话。
+5. 每次只允许一个写作 agent 修改 `正文.md`，禁止并发写同一小说。首批可创建正文；后续批次只能追加或定点修改本批内容，不得重写已经验收的小节。
+6. prompt 只传项目路径、目标节号、设定/大纲/摘要/正文路径和硬约束，不粘贴全文。要求 agent 自行读取 `设定.md`、`小节大纲.md`、`已写小节摘要.md` 及 `正文.md` 尾部 300-500 字。
+7. agent 写完后必须直接更新 `正文.md`，并覆盖更新 `已写小节摘要.md`（3-5 条：本批节号、已揭示信息、情绪位置、状态变化、未回收伏笔、下一批衔接句）；只向主会话返回不超过 200 字的落盘摘要。
+8. 主会话只读取该摘要、更新后的 `已写小节摘要.md` 和正文尾部 300-500 字，再执行节号、字数、格式和 AI 句式检查。需要返修时，仍通过同一运行时分支把问题清单和文件路径交给子代理，不回传整段正文。
+9. 只有当前会话既没有 `sessions_spawn`、也没有可用的 `Agent` custom subagent，或真实调用按上述规则重试后明确失败，或用户明确要求主会话写作时，才允许主会话按相同批次与验收规则直接写正文。文件不存在、一次请求超时、上下文压缩或模型没有主动发起工具调用都不是自动降级理由。
 
 调用 prompt 至少包含：
 
