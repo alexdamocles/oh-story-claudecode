@@ -1,4 +1,4 @@
-﻿# writing-workflow.md：短篇写作工作流详解
+# writing-workflow.md：短篇写作工作流详解
 
 本文件包含 story-short-write 的详细工作流程指引。SKILL.md 中只保留摘要和触发条件。
 

@@ -1,4 +1,4 @@
-﻿---
+---
 name: narrative-writer
 description: |
   叙事文本创作与去AI味专家。负责正文写作（三维度揉进、感知/反应）、

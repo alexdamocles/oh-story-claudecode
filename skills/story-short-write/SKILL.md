@@ -1,4 +1,4 @@
-﻿---
+---
 name: story-short-write
 version: 1.0.0
 description: |
