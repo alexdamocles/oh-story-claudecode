@@ -1,7 +1,7 @@
 # 通用写作技法
 
 > 跨题材通用写作时加载。先看决策路由选技法区域，再按操作执行。
-> 题材公式见 genre-writing-formulas.md。
+> 女频复仇事件与情绪公式见 female-revenge-writing-formulas.md。
 
 ---
 

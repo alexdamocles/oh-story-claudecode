@@ -69,7 +69,7 @@
 |-----------|------|
 | 核心梗设计与循环机制 | `genre-core-mechanics.md` |
 | 读者心理与期待管理 | `genre-readers.md` |
-| 对应题材写作公式 | `genre-writing-formulas.md` |
+| 女频复仇事件与情绪公式 | `female-revenge-writing-formulas.md` |
 
 ---
 
