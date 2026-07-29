@@ -10,7 +10,7 @@
 
 - 写贯穿道具 → 加载 `writing-craft.md` ✅/❌
 - 写反派/揭露方式 → 加载 `villain-and-reveal.md` ✅/❌
-- 写 4.2 万字女频大纲 → 加载 `corpus-19-structure-profile.md`；需要局部事件或情绪公式时，再加载 `female-revenge-writing-formulas.md` ✅/❌
+- 写 4.2 万字女频大纲 → 加载 `corpus-19-structure-profile.md`；需要局部事件或情绪公式时，再加载 `genre-writing-formulas.md` ✅/❌
 - 反转信息差验证 → 需加载 `reversal-toolkit.md` 或 `writing-craft.md` ✅/❌
 - 伏笔回查 → 需加载 `writing-craft.md` ✅/❌
 - 如某项不适用（如无反派），标注原因后可跳过
@@ -69,7 +69,7 @@
 
 - 必读：`format-and-structure.md`
 - 必读：`anti-ai-writing.md`（写作时自检 AI 腔）
-- 按已确定方向加载 1 个：`female-revenge-writing-formulas.md` 中对应事件与情绪公式
+- 按已确定方向加载 1 个：`genre-writing-formulas.md` 中对应事件与情绪公式
 - 按需加载：`writing-craft.md` / `villain-and-reveal.md` / `emotional-methods.md`
 
 ### 工作目录结构

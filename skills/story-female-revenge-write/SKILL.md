@@ -48,7 +48,7 @@ metadata:
 除了上面的执行规则，构思和写作时遵循：
 
 - **从验证过的模式出发**：有对标书就先拆解；没有对标书时，先从 `genre-catalog.md` 确认固定的五段式、双发动机与 20 节骨架。题材方向由用户要求、默认女频约束或专门选题资料决定，不把该文件当作选题入口
-- **用模块组装**：铺垫段、升级段、反转段各有成熟写法，不要重新发明。参考 `female-revenge-writing-formulas.md` 对应方向
+- **用模块组装**：铺垫段、升级段、反转段各有成熟写法，不要重新发明。参考 `genre-writing-formulas.md` 对应方向
 - **默认加载女频虐渣参考库**：默认初稿约 42000 字（40000-45000 字）古代或民国背景女频虐渣爽文时，先用 `corpus-19-structure-profile.md` 建立双发动机、对抗升级链和新秩序攻防，再用 `female-revenge-longform-pipeline.md` 做选题矩阵、背叛/反杀/火葬场校准；需要快速生成钩子、硬技能、爽点组合时，再用 `female-short-pipeline-formula.md` 补充
 - **只加载必需信息**：写每节前明确目标情绪和要用的技法，答不出就先回读参考
 
@@ -529,7 +529,7 @@ novels/
 | [references/writing-workflow.md](references/writing-workflow.md) | Phase 2 核心框架 + Phase 3 大纲 + Phase 5 精修 |
 | [references/writing-craft.md](references/writing-craft.md) | 写作全程参考 |
 | [references/anti-ai-writing.md](references/anti-ai-writing.md) | 去AI味时必读 |
-| [references/female-revenge-writing-formulas.md](references/female-revenge-writing-formulas.md) | 女频复仇爽文公式补充库，按已确定方向加载 |
+| [references/genre-writing-formulas.md](references/genre-writing-formulas.md) | 女频复仇爽文公式补充库，按已确定方向加载 |
 | [references/genre-writing-techniques.md](references/genre-writing-techniques.md) | 通用写作技法+情绪操控+感情线法则 |
 | [references/emotional-methods.md](references/emotional-methods.md) | 设计情感时 |
 | [references/hooks-chapter.md](references/hooks-chapter.md) | 章节钩子设计 |
@@ -551,7 +551,7 @@ novels/
 | [references/character-relations.md](references/character-relations.md) | 人物关系设计 |
 | [references/dialogue-mastery.md](references/dialogue-mastery.md) | 写对话时 |
 | [references/opening-design.md](references/opening-design.md) | 设计开头时（短篇用法：「前3章」读作开篇首节~前1/3，七步法按目标字数等比缩放） |
-| [references/genre-catalog.md](references/genre-catalog.md) | 女频复仇固定结构总表（五段式、双发动机、20 节、钩子、反杀与结局） |
+| [references/genre-catalog.md](references/genre-catalog.md) | 女频复仇爽文结构总表（五段式、双发动机、20 节、钩子、反杀与结局） |
 | [references/genre-core-mechanics.md](references/genre-core-mechanics.md) | 核心梗设计 |
 | [references/genre-readers.md](references/genre-readers.md) | 读者心理 |
 | [references/state-tracking.md](references/state-tracking.md) | 状态追踪协议（Phase 4 写前准备参考） |
@@ -570,7 +570,7 @@ novels/
 | 钩子 | **`references/hooks-chapter.md`**（章节/开篇钩子类型） | `references/hooks-paragraph.md`（段落钩子）· `references/hooks-suspense.md`（悬念设计） |
 | 女频写作 | **`references/female-audience-writing.md`**（核心原则 / 文案结构体系 / 感情线写法深化） | `references/genre-writing-techniques.md`（女频读者心理与写作技法 / 感情线四阶段推进法）· `references/genre-readers.md`（读者心理） |
 | 古代/民国女频虐渣爽文 | **`references/corpus-19-structure-profile.md`**（双发动机 / 对抗升级 / 新秩序攻防 / 20 节骨架） | `references/female-revenge-longform-pipeline.md`（选题矩阵 / 5 段式 / 背叛反杀匹配 / 火葬场）· `references/female-short-pipeline-formula.md`（快速钩子与爽点组合）· `references/female-audience-writing.md` |
-| 女频复仇公式 | **`references/female-revenge-writing-formulas.md`**（事件与情绪公式速查） | `references/genre-core-mechanics.md`（核心梗设计） |
+| 女频复仇公式 | **`references/genre-writing-formulas.md`**（事件与情绪公式速查） | `references/genre-core-mechanics.md`（核心梗设计） |
 | 女频复仇长篇结构 | **`references/genre-catalog.md`**（五段式 / 双发动机 / 20 节 / 钩子 / 反杀与结局） | `references/corpus-19-structure-profile.md`（结构依据与完整节点）· `references/female-revenge-longform-pipeline.md`（反杀与火葬场细化） |
 | 开头 | **`references/opening-design.md`**（黄金一章 / 三大基点 / 题材开头模板；短篇：「前3章」读作开篇首节~前1/3、七步法按目标字数等比缩放） | `references/hooks-chapter.md`（开篇钩子类型） |
 | 格式与节奏 | **`references/format-and-structure.md`**（正文格式硬规范） | `references/writing-craft.md`（三维度揉进）· `references/writing-workflow.md`（设计/精修工作流） |

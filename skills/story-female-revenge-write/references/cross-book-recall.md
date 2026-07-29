@@ -57,5 +57,5 @@ sync-source: skills/story-long-write/references/cross-book-recall.md
 | `hooks` | 钩子数 | `hooks-chapter.md` / `hooks-suspense.md` / `opening-design.md` |
 | `setup_clues` | 反转铺垫线索 | `reversal-toolkit.md` |
 | `character_archetypes` | 反差人物 | `character-design-methods.md` 三层标签反差 |
-| `reusable_structures` | 可复用手法 | `female-revenge-writing-formulas.md` / `writing-craft.md` |
+| `reusable_structures` | 可复用手法 | `genre-writing-formulas.md` / `writing-craft.md` |
 | `reversal_type` | 反转类型（7 枚举） | `reversal-toolkit.md` 对应骨架 |
