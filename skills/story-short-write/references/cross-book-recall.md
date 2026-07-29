@@ -1,13 +1,12 @@
 ---
 name: cross-book-recall
 description: 多对标跨书召回
-sync-source: skills/story-long-write/references/cross-book-recall.md
 ---
 
 # 跨书召回
 
 ## 触发
-项目根 `拆文库/` 或项目 `对标/` ≥2 本启用。主对标书取 `设定/题材定位.md`「主对标书」字段，缺失则用字典序第一本并在 `gaps.main_benchmark_unspecified: true` / 导入报告中提示用户补。
+项目根 `拆文库/` 或项目 `对标/` ≥2 本启用。主对标书取 `设定/题材定位.md`「主对标书」字段（在「对标登记」或导入生成的「对标书清单」段内，字段名一致），缺失则用字典序第一本（对 `对标/` 目录取字典序；无 `对标/` 则对 `拆文库/`）并在 `gaps.main_benchmark_unspecified: true` / 导入报告中提示用户补。
 
 > **数量规则**：主对标书最多 1 本，用于文风和最终正文输入；副对标 / 参考对标**不限制登记数量**。执行时按题材相关性、引用强度和阶段预算逐本召回；超过预算时裁剪条目，不删除书目。
 
@@ -17,7 +16,7 @@ sync-source: skills/story-long-write/references/cross-book-recall.md
 3. narrative-writer 正文 prompt 只吃主对标文风/原文锚点 + 预算筛选后的 `副对标召回摘要`；不读取、不传入副对标 `文风.md` 或副书原文
 
 ## 跨题材判断
-读每本副对标 `设定/题材定位.md`「题材类型」与「引用强度」：
+从项目 `设定/题材定位.md`「对标书列表」字段读每本副对标的「题材类型」与「引用强度」（未登记的书按「参考」处理，并输出 `gaps.benchmark_registry_missing: true`）：
 - 同题材 + 引用强度=辅：全阶段可召回，按每本上限取条目
 - 同题材 + 引用强度=参考：只取最相关条目，默认不超过每本上限的一半
 - 弱相关：仅设定/大纲，每本 ≤1 条
@@ -35,6 +34,8 @@ sync-source: skills/story-long-write/references/cross-book-recall.md
 | 模块 | `角色/` + `剧情/` + `设定/` | — | ≤2 | 0 | ≤8 |
 | 正文 | `文风.md` + 原文 | `写作手法.md` + 原文 | 0 | 0 | 0 |
 
+> **大纲阶段按剧情单元检索**：检索键为剧情单元「类型」（第一键，必填枚举）/「桥段标签、套路框架位置」（第二键）；同题材内同类命中条目优先进入预算。仅限大纲阶段按剧情单元检索时生效，不改其余阶段排序与预算数字。同类零命中时回退主对标来源条并输出非阻塞 `gaps.similar_plot_not_found: true`，流程继续。
+
 ## 输出要求
 
 跨书召回输出必须包含：
@@ -49,13 +50,13 @@ sync-source: skills/story-long-write/references/cross-book-recall.md
 若副书很多，只输出被本阶段实际召回的条目；未召回的副书不代表被删除，只是本阶段预算未命中。正文阶段可传入本表作为结构/情绪/设定参考，但必须保留“副书不进文风、不进原文锚点”的边界。
 
 ## 拆文字段 → 写作参考
-读 `_meta.json.structure_counts` 时，按此表回查对应写作 reference：
+读 `_meta.json.structure_counts` 时，按此表回查当前 skill 已登记的对应写作 reference。短篇优先走 genre-styles 题材包与 short-craft，长篇优先走长篇同类理论文件；未在当前 skill `参考资料` 表登记的文件不要跨 skill 加载。
 
 | 拆文字段 | 含义 | 写作参考 |
 |---------|------|---------|
-| `beats` | 结构段（开端/发展/高潮/结局） | `genre-catalog.md` 题材结构 |
-| `hooks` | 钩子数 | `hooks-chapter.md` / `hooks-suspense.md` / `opening-design.md` |
+| `beats` | 结构段（开端/发展/高潮/结局） | 当前 skill 的题材结构文件；短篇优先 genre-styles 题材包 / `genre-writing-formulas.md` |
+| `hooks` | 钩子数 | `hooks-chapter.md` / `hooks-suspense.md`；短篇开头密度补 short-craft |
 | `setup_clues` | 反转铺垫线索 | `reversal-toolkit.md` |
-| `character_archetypes` | 反差人物 | `character-design-methods.md` 三层标签反差 |
-| `reusable_structures` | 可复用手法 | `genre-writing-formulas.md` / `writing-craft.md` |
+| `character_archetypes` | 反差人物 | 当前 skill 的人物/题材风格文件；短篇优先 genre-styles 题材包 / genre-writing-techniques |
+| `reusable_structures` | 可复用手法 | `genre-writing-formulas.md`；短篇可补 short-craft |
 | `reversal_type` | 反转类型（7 枚举） | `reversal-toolkit.md` 对应骨架 |
