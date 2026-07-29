@@ -15,14 +15,9 @@ metadata:
 
 ---
 
-## 启动行为（最高优先级）
+## 启动自动决策模式（最高优先级）
 
-当用户触发 `/story-female-revenge-write` 或提出女频虐渣、古言复仇、追妻火葬场故事但没有提供题材、梗概、参考书、现有小说目录时，不要回复“你想写什么”或要求用户给方向。把空请求视为“自动新开一篇”，立即执行：
-
-1. 读取默认参考库和项目根目录 `创意索引.jsonl`。
-2. 自动生成 3 个候选选题并评分去重。
-3. 自动选定最优题材、核心框架和默认 20 节的大纲；情节确有需要时可在 18-22 节内调整。
-4. 大纲自检通过后直接开始写 `正文.md`。
+当用户触发 `/story-female-revenge-write` 或提出女频虐渣、古言复仇、追妻火葬场故事但没有提供题材、梗概、参考书、现有小说目录时，不要回复“你想写什么”或要求用户给方向。把空请求视为“自动新开一篇”，进入下方“自动决策模式”。启动段只负责路由：具体选题与 `设定.md` 落盘在 Phase 2 执行，小节大纲在独立的 Phase 3 执行，随后才进入正文。
 
 只有外部编排器或用户明确给出现有小说工程路径，并明确要求“续写/继续写/根据审查报告修文/修复这篇”时，才进入指定目录处理；不得自行扫描 novels 目录、创意索引或数据库来决定哪本未完成。
 
@@ -66,10 +61,9 @@ metadata:
 除非用户明确要求“让我选”“先给我几个方案”“大纲确认后再写”，否则全流程默认自动推进。用户没有给题材方向、且没有被外部编排器指定现有小说目录时，不得追问；直接把本次任务按“自动新开一篇”处理，并在 `novels/{短篇标题}/` 下创建本篇工程：
 
 1. 不在选题、情绪目标、核心框架、小节大纲阶段等待用户选择或确认；生成目录固定为 `novels/{短篇标题}/`。
-2. 情绪目标固定为“意难平 + 爽感释放”，背景默认固定为古代优先、少量民国，不再生成情绪候选、不再询问用户选择情绪。用户没有明确方向时，先读取 `创意索引.jsonl` 做去重，再围绕“古代/民国背景 + 固定情绪”生成 3 个候选选题，用“背叛烈度、意难平强度、爽感兑现度、反杀层级匹配度、时代背景落地度、4.2 万字支撑力、写作新鲜感”七项各 1-10 分打分，自动选择总分最高且约 42000 字最可落地的一项。背景选择按长期配比控制：默认约 5 篇里 4 篇古代、1 篇民国；如果没有历史记录，当前批次优先先出古代。
-3. 用户给出模糊方向时，将其视为约束条件，在约束内生成候选并自动选最优，不把候选列表交给用户投票。
-4. 小节大纲写完后自行做反转信息差验证、伏笔回查、5 段式比例与 40000-45000 字初稿可行性检查；检查通过就进入正文写作，不等待人工确认。
-5. 为可追溯，仍在 `设定.md` 中写入“自动决策记录”：候选摘要、评分、最终选择理由、被放弃方案的一句话原因。
+2. 依次自动执行 Phase 1、Phase 2 与 Phase 3；其中 Phase 2 负责选题、核心框架和一次性 `设定.md` 落盘，Phase 3 负责分批生成并验证 `小节大纲.md`。
+3. 用户给出模糊方向时，将其作为 Phase 2 的约束条件；在约束内自动选择最优方案，不把候选列表交给用户投票。
+4. Phase 3 的大纲自检通过后直接进入 Phase 4 正文写作，不等待人工确认。
 
 ### 框架去重机制
 
@@ -121,7 +115,7 @@ metadata:
 
 ---
 
-### Phase 2：构思核心框架
+### Phase 2：自动选题与核心框架（设定落盘）
 
 > 如果用户有参考小说，先用 `/story-short-analyze` 拆解。默认输出存入项目根目录 `拆文库/{书名}/`；如用户指定当前短篇引用目录，则可输出/同步到 `novels/{短篇标题}/对标/{书名}/`。写作时会自动查找并读取这些拆文结果，不需要用户手动复制到 prompt。
 
@@ -248,7 +242,9 @@ metadata:
 |---|---|---|---|
 ```
 
-框架自动确定后，完成设计任务，然后在 `novels/{短篇标题}/` 下创建文件；若 `novels/` 不存在，先创建该目录。不要停下来询问用户是否接受框架；只有用户明确要求人工确认时才暂停。
+在 Phase 2 中，先读取 `创意索引.jsonl` 去重；用户没有明确方向时，围绕“古代/民国背景 + 固定情绪”生成 3 个候选选题，按背叛烈度、意难平强度、爽感兑现度、反杀层级匹配度、时代背景落地度、4.2 万字支撑力、写作新鲜感七项各 1-10 分评分，自动选择总分最高且最可落地的一项。背景默认约 5 篇里 4 篇古代、1 篇民国；用户的模糊方向作为候选约束。
+
+选题和核心框架完整后，在 `novels/{短篇标题}/` 下**一次性**创建完整 `设定.md`；若 `novels/` 不存在，先创建该目录。`设定.md` 必须同时包含自动决策记录、对标摘要（如有）和第 90 行列出的全部框架字段。不得先写“选题版设定”再覆盖为“框架版设定”，也不得把小节大纲写入本文件。不要停下来询问用户是否接受框架；只有用户明确要求人工确认时才暂停。
 
 #### 设计任务（框架确定后执行）
 
@@ -258,19 +254,30 @@ metadata:
 2. 设计反派（如有）→ 加载 `villain-and-reveal.md`
 3. 确定揭露方式 → 同上
 4. 按 `corpus-19-structure-profile.md` 先设计“关系断裂 + 新秩序攻防”双发动机，写清至少 3 次不同层级的对手反制和 1 次女主重大损失
-5. 分批编写 `小节大纲.md`（格式见 writing-workflow.md）：默认按约 42000 字规划 20 节（情节确有需要时可为 18-22 节），单节目标 1900-2300 字。先写 5 条全局结构锚点，再按 `1-5 / 6-10 / 11-15 / 16-20` 四批生成详细小节；调整节数时仍保证每批不超过 5 节。每批立即追加落盘并检查连续节号，禁止在单个模型响应中一次生成 18-22 节详细大纲。每节固定为一行 `## 第N节 | ...`，标明结构段/五段功能、主动选择、对手反制、代价、状态变化、预计字数、人物/关系变化、因果/逻辑链、结尾承接/钩子
-6. 反转信息差验证（公式见 writing-workflow.md）
-7. 伏笔回查清单（标准见 writing-workflow.md）
-
-四批小节大纲全部落盘后再执行全局验证并继续：如果生成了多个大纲方案，按“反转清晰度、节奏密度、伏笔回收完整度、情绪峰值维持、字数可控性”五项评分，选择最优方案写入 `小节大纲.md`。不得把多个大纲方案交给用户选择；未通过验证时只定点修订失败批次，不重写已通过批次。会话恢复时先扫描 `小节大纲.md` 的最高连续完整节号，从下一节所在批次继续；一次超时、截断或上下文压缩不得导致从第 1 节重来。单批仍失败时临时缩为 2-3 节/批。
 
 #### Agent 调用：character-designer
 
 设计任务完成后，如果项目已部署 character-designer agent（优先检查 `.claude/agents/` 下的 `character-designer.md` 是否存在；不存在时再检查 `.opencode/agents/`），可 spawn `Agent(subagent_type: "character-designer", prompt: "项目目录：novels/{短篇标题}\n任务类型：角色设定\n查询参数：{人设速写+关系}")` 辅助角色设定和语言风格档案。如 agent 不可用，由主线程直接执行。
 
+若调用 character-designer，先将可用结果合并进核心框架，再一次性落盘 `设定.md`；不得由该 agent 另行覆盖或创建半截设定。
+
 ---
 
-### Phase 3：逐场景写作
+### Phase 3：生成小节大纲
+
+前提：`设定.md` 已完整落盘。此阶段只生成和验证 `小节大纲.md`，不得回写或重写 `设定.md`，也不得开始正文。
+
+1. 先写 5 条全局结构锚点。
+2. 默认按约 42,000 字规划 20 节；情节确有需要时可为 18-22 节，单节目标 1,900-2,300 字。
+3. 按 `1-5 / 6-10 / 11-15 / 16-20` 四批生成详细小节；调整节数时仍保证每批不超过 5 节。每批立即追加落盘并检查连续节号，禁止在单个模型响应中一次生成 18-22 节详细大纲。
+4. 每节固定为一行 `## 第N节 | ...`，标明结构段/五段功能、主动选择、对手反制、代价、状态变化、预计字数、人物/关系变化、因果/逻辑链、结尾承接/钩子。
+5. 四批全部落盘后，执行反转信息差验证、伏笔回查、五段式比例与 40,000-45,000 字可行性检查；如果存在多个方案，按反转清晰度、节奏密度、伏笔回收完整度、情绪峰值维持、字数可控性评分，选择最优方案写入 `小节大纲.md`。
+
+未通过验证时，只定点修订失败批次，不重写已通过批次。会话恢复时先扫描 `小节大纲.md` 的最高连续完整节号，从下一节所在批次继续；一次超时、截断或上下文压缩不得导致从第 1 节重来。单批仍失败时临时缩为 2-3 节/批。通过后进入 Phase 4。
+
+---
+
+### Phase 4：逐场景写作
 
 **项目文件结构**：
 
@@ -278,8 +285,8 @@ metadata:
 novels/
 └── {短篇标题}/
     ├── 设定.md              ← Phase 2 产出（含对标摘要）
-    ├── 小节大纲.md          ← Phase 2 产出
-    ├── 正文.md              ← Phase 3 产出
+    ├── 小节大纲.md          ← Phase 3 产出
+    ├── 正文.md              ← Phase 4 产出
     └── 对标/                ← 当前短篇引用视图（可选）
         └── {书名}/
             ├── 拆文报告.md
@@ -289,7 +296,7 @@ novels/
 
 **拆文结果自动使用规则**：执行写作前必须按“对标上下文加载”顺序扫描 `novels/{短篇标题}/对标/{书名}/`、项目根 `拆文库/{书名}/`、`novels/{短篇标题}/拆文库/{书名}/`，再兼容旧结构 `{短篇标题}/对标/{书名}/`。找到拆文报告时，把“结构/情绪/反转/写作手法”作为技法参考；找到结构化子目录时，按当前小节目标检索最相关模块。
 
-> 术语说明：Phase 3 按「段」划分叙事结构（开头段/铺垫段/升级段/反转段/结尾段），每段包含若干「小节」（数字编号的 beat）。「场景」指写作时的具体画面。
+> 术语说明：Phase 4 按「段」划分叙事结构（开头段/铺垫段/升级段/反转段/结尾段），每段包含若干「小节」（数字编号的 beat）。「场景」指写作时的具体画面。
 
 **写前准备**（每个场景写前执行 2 步，是核心方法的落地：确认情绪目标 → 召回技法模块）：
 - **步骤 1：记忆+召回**：① 本场景目标情绪词？② 借鉴哪个参考文件的哪个技法？③ 具体用在哪个段落？答不出 → 先回读参考再动笔。如有 `对标/` 或 `拆文库/` 结构化产出，按“对标上下文加载”规则检索与当前场景最相关的结构/情绪/反转/写作手法模块作为参考，并写入“拆文召回摘要”
@@ -459,7 +466,7 @@ novels/
 
 ---
 
-### Phase 3 完成门槛（进入 Phase 4 前必须通过）
+### Phase 4 完成门槛（进入 Phase 5 前必须通过）
 
 - [ ] 节数 = 小节大纲规划节数（不得合并/省略）
 - [ ] 身体部位同一词全文 ≤ 5 次
@@ -477,7 +484,7 @@ novels/
 
 ---
 
-### Phase 4：精修打磨
+### Phase 5：精修打磨
 
 加载 `references/writing-workflow.md` 中的精修清单完成检查。正文完成后不要自动进入 `story-review`；先立即停止当前写作流程，并在最终回复末尾单独输出一行 `6666666` 作为正文完结信号，供局域网 watchdog 判断“正文已完成、等待压缩上下文与审文指令”。收到 watchdog 后续明确发来的压缩上下文或开始审文指令前，不得自行触发 `story-review solo`、`story-review full`、`story-review lean` 或任何自动审文闭环。`story-review` 是协调器，不是单个检查脚本。
 重点：开头钩子、情绪曲线、反转铺垫、每句话价值、格式规范、AI 腔排查。文件模式必须先运行 `node scripts/normalize-punctuation.js 正文.md`，再运行 `node scripts/check-ai-patterns.js --check 正文.md`；后者只报告不改写，命中时回到正文改掉并复扫到 0。
@@ -496,14 +503,14 @@ novels/
 
 ## 流程衔接
 
-**位置：** 写作（第 3/3 步）
+**位置：** 正文写作（Phase 4）
 
 | 时机 | 跳转到 | 命令 |
 |---|---|---|
 | 有参考小说想对标 | story-short-analyze | `/story-short-analyze` → 输出存入 `拆文库/{书名}/` |
 | 正文完成后交给 watchdog | story-review | 输出 `6666666` → 等待压缩上下文与后续审文指令 |
 | 写完，去 AI 味 | story-deslop | /story-deslop |
-| 想自检 | 本 skill 质量自检 | 用 Phase 4 自检流程 + `references/quality-checklist.md` 逐项核对 |
+| 想自检 | 本 skill 质量自检 | 用 Phase 5 自检流程 + `references/quality-checklist.md` 逐项核对 |
 | 需要市场方向 | story-short-scan | `/story-short-scan` |
 | 设定太大，适合长篇 | story-long-write | `/story-long-write` |
 
@@ -516,7 +523,7 @@ novels/
 | 文件 | 何时加载 |
 |------|----------|
 | [references/format-and-structure.md](references/format-and-structure.md) | 写作前必读 |
-| [references/writing-workflow.md](references/writing-workflow.md) | Phase 2 设计任务 + Phase 4 精修 |
+| [references/writing-workflow.md](references/writing-workflow.md) | Phase 2 核心框架 + Phase 3 大纲 + Phase 5 精修 |
 | [references/writing-craft.md](references/writing-craft.md) | 写作全程参考 |
 | [references/anti-ai-writing.md](references/anti-ai-writing.md) | 去AI味时必读 |
 | [references/genre-writing-formulas.md](references/genre-writing-formulas.md) | 核心参考，按题材加载 |
@@ -530,8 +537,8 @@ novels/
 | [references/emotional-arc-design.md](references/emotional-arc-design.md) | 设计情绪曲线时 |
 | [references/quality-checklist.md](references/quality-checklist.md) | 精修检查时 |
 | [references/banned-words.md](references/banned-words.md) | 禁用词表 |
-| [scripts/normalize-punctuation.js](scripts/normalize-punctuation.js) | Phase 4 文件模式确定性标点收尾 |
-| [scripts/check-ai-patterns.js](scripts/check-ai-patterns.js) | Phase 3 完成门槛与 Phase 4 复扫；只报告高危 AI 句式 |
+| [scripts/normalize-punctuation.js](scripts/normalize-punctuation.js) | Phase 5 文件模式确定性标点收尾 |
+| [scripts/check-ai-patterns.js](scripts/check-ai-patterns.js) | Phase 4 完成门槛与 Phase 5 复扫；只报告高危 AI 句式 |
 | [references/female-audience-writing.md](references/female-audience-writing.md) | 女频写作时 |
 | [references/corpus-19-structure-profile.md](references/corpus-19-structure-profile.md) | 默认 4.2 万字女频故事构思时；读取 `W:\小说` 语料提炼出的双发动机、事件攻防、20 节骨架和模仿边界 |
 | [references/female-revenge-longform-pipeline.md](references/female-revenge-longform-pipeline.md) | 默认初稿约 42000 字（40000-45000 字）古代或民国背景女频虐渣爽文时；按需读取选题矩阵、背叛/反杀层级、5 段式结构、火葬场 |
@@ -544,7 +551,7 @@ novels/
 | [references/genre-catalog.md](references/genre-catalog.md) | 女频复仇固定结构总表（五段式、双发动机、20 节、钩子、反杀与结局） |
 | [references/genre-core-mechanics.md](references/genre-core-mechanics.md) | 核心梗设计 |
 | [references/genre-readers.md](references/genre-readers.md) | 读者心理 |
-| [references/state-tracking.md](references/state-tracking.md) | 状态追踪协议（Phase 3 写前准备参考） |
+| [references/state-tracking.md](references/state-tracking.md) | 状态追踪协议（Phase 4 写前准备参考） |
 | [references/output-contract.md](references/output-contract.md) | Phase 2 对标上下文加载时（理解 analyze 产出格式与消费规范） |
 
 ### 按主题快速定位（横切主题）
