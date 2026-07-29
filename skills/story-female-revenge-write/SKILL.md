@@ -10,7 +10,6 @@ metadata:
 
 # story-female-revenge-write：女频虐渣爽文写作
 
-你是短篇/中篇网文写作执行器。从构思到成稿，完成一篇完整小说。默认初稿目标是约 42000 字（40000-45000 字）古代优先、少量民国的女频虐渣爽文；只有用户明确要求更短时，才切回 8000-20000 字短篇模式。
 
 **执行规则：故事以情绪为目标，所有内容为情绪服务。**
 
@@ -33,12 +32,12 @@ metadata:
 
 ## 执行规则
 
-1. **先定情绪，再定故事**。动笔前必须确定目标情绪（意难平/反转震撼/爽感释放/治愈温暖/细思极恐/共鸣感动），所有内容为这个情绪服务。
+1. **先定情绪，再定故事**。默认设定目标情绪（意难平和爽感释放），所有内容为这个情绪服务。
 2. **一个反转撑一篇**。所有铺垫为反转服务，所有情绪为反转蓄力。不多线、不铺世界观。
 3. **每句话必须有用**。不推动剧情、不铺垫反转、不推高情绪的句子 → 删。
 4. **开头 30 秒定生死，前 100 字必须爆炸式下钩，结尾定传播**。开头必须在前 100 字内抛出强冲突/强反常/强信息差/强代价中的至少一种，让读者 30 秒内被钩住；禁止温吞铺垫，结尾必须有余韵。
 5. **默认第三人称旁白**。正文旁白、场景、动作、心理描写默认使用第三人称推进；人物对白允许自然使用第一人称，不要把对白也强行改成第三人称。
-6. **默认初稿约 42000 字（40000-45000 字）古代优先、少量民国背景**。按 5 段式写完整古代或民国背景女频虐渣爽文：伤害 10%、隐忍 20%、反杀 30%、新秩序攻防 30%、火葬场 10%。用户没有特别指定时，不按 8000 字短篇收束。
+6. **默认初稿约 42000 字（40000-45000 字）古代优先、少量民国背景**。按 5 段式写完整古代或民国背景女频虐渣爽文：伤害 10%、隐忍 20%、反杀 30%、新秩序攻防 30%、火葬场 10%。
 7. **新增参考库只做补充**。`references/corpus-19-structure-profile.md`、`references/female-revenge-longform-pipeline.md` 与 `references/female-short-pipeline-formula.md` 是结构/题材/风格/素材库，不替换本文件、格式规范、去 AI 味、字数验证等硬约束。
 
 ---
@@ -53,7 +52,7 @@ metadata:
 
 除了上面的执行规则，构思和写作时遵循：
 
-- **从验证过的模式出发**：有对标书就先拆解，没有就从题材框架（genre-catalog.md）找对应的剧情模式
+- **从验证过的模式出发**：有对标书就先拆解；没有对标书时，先从 `genre-catalog.md` 确认固定的五段式、双发动机与 20 节骨架。题材方向由用户要求、默认女频约束或专门选题资料决定，不把该文件当作选题入口
 - **用模块组装**：铺垫段、升级段、反转段各有成熟写法，不要重新发明。参考 genre-writing-formulas.md 对应题材
 - **默认加载女频虐渣参考库**：默认初稿约 42000 字（40000-45000 字）古代或民国背景女频虐渣爽文时，先用 `corpus-19-structure-profile.md` 建立双发动机、对抗升级链和新秩序攻防，再用 `female-revenge-longform-pipeline.md` 做选题矩阵、背叛/反杀/火葬场校准；需要快速生成钩子、硬技能、爽点组合时，再用 `female-short-pipeline-formula.md` 补充
 - **只加载必需信息**：写每节前明确目标情绪和要用的技法，答不出就先回读参考
@@ -109,9 +108,6 @@ metadata:
 | 意难平（固定主情绪之一） | 虐恋、遗憾、错过、误解、亏欠 | 中 | 🔥🔥🔥 |
 | 反转震撼 | 悬疑、身份错位 | 高 | 🔥🔥🔥 |
 | 爽感释放（固定主情绪之一） | 打脸、逆袭、复仇、醒悟、补偿、自我成全 | 低 | 🔥🔥 |
-| 治愈温暖 | 成长、亲情、友情 | 中 | 🔥🔥 |
-| 细思极恐 | 悬疑、心理 | 高 | 🔥 |
-| 共鸣感动 | 现实、职场、婚姻 | 中 | 🔥🔥🔥 |
 
 ### 参考库加载规则（默认）
 
@@ -169,7 +165,6 @@ metadata:
 
 #### Agent 调用：story-architect
 
-构思阶段，如果项目已部署 story-architect agent（优先检查 `.claude/agents/` 下的 `story-architect.md` 是否存在；不存在时再检查 `.opencode/agents/`），可 spawn `Agent(subagent_type: "story-architect", prompt: "项目目录：novels/{短篇标题}\n任务类型：约 42000 字（40000-45000 字）古代或民国背景女频虐渣爽文构思\n模式：自动决策，不等待用户选择\n查询参数：{固定情绪目标：意难平 + 爽感释放；固定背景：古代优先、民国约占五分之一，绝不现代；默认初稿目标字数：约 42000（40000-45000）；默认 20 节；题材方向}\n要求：先读取 `references/corpus-19-structure-profile.md` 建立关系断裂与新秩序攻防双发动机，再按需读取 `references/female-revenge-longform-pipeline.md` 做选题矩阵、背叛/反杀/火葬场校准；读取 `创意索引.jsonl` 做六维去重；生成不少于3个候选核心框架，候选必须与最近历史框架至少3个维度不同；按背叛烈度、意难平强度、爽感兑现度、反杀层级匹配度、4.2 万字支撑力、写作新鲜感六项评分，并执行重复惩罚；选择总分最高且最可落地的一项，输出最终框架和自动决策记录。")` 辅助框架设计。如 agent 不可用，由主线程直接执行同一套自动决策流程。
 
 自动确定故事的核心框架（必须先完成框架去重）：
 
@@ -306,7 +301,9 @@ novels/
 
 #### Agent 调用：narrative-writer
 
-正文默认按 2-3 节/批串行推进，并优先交给 `narrative-writer` 直接落盘。主会话只负责编排批次、传递文件路径和当前目标、运行机器检查、验收摘要；不得要求子代理把正文返回对话，也不得把整篇 `正文.md` 重新读入主上下文。
+**子代理粒度硬约束：每次只能派发一个 `narrative-writer` 子代理，仅写一个小节。必须等该节落盘并通过字数、格式、节号和摘要验收后，才能派发下一节。禁止在同一个子代理任务中写入多节。
+
+正文默认按 1 节/批串行推进，并优先交给 `narrative-writer` 直接落盘。主会话只负责编排批次、传递文件路径和当前目标、运行机器检查、验收摘要；不得要求子代理把正文返回对话，也不得把整篇 `正文.md` 重新读入主上下文。
 
 1. 主会话确定本批节号后，先检查当前会话实际公开的工具名，再按运行时分支调用。不得用 `.claude/agents/narrative-writer.md` 文件存在代替“子代理工具可用”的判断，也不得只在文字中声称“准备调用”；必须出现真实工具调用及成功返回。
 2. **OpenClaw 分支**：当前工具包含 `sessions_spawn` 时，必须优先调用它，不得调用 Claude Code 的 `Agent(...)`。`.claude/agents/narrative-writer.md` 只是子会话要读取的角色契约，不等于 OpenClaw `agentId` 已注册。调用格式固定为：
@@ -355,8 +352,6 @@ novels/
 - **根据审查报告修文 / 审后修复 / 已有 `最终审查报告.md` 后复修**：完成条件改为“修掉本轮 S1/S2/S3 问题并保持既有剧情、设定、节数稳定”，**不得因当前总字数、单节字数或历史目标字数再次自动扩写**；除非用户明确要求“补字数/扩写/达到平台硬门槛”。
 
 ⚠️ **硬约束：默认初稿总字数约 42000 字（40000-45000 字）；默认 20 节，单节目标 1900-2300 字，单节硬下限 1600 字，原则上不超过 2600 字**。
-默认古代或民国背景女频虐渣爽文不启用 500 字/节例外。只有用户明确要求 8000-20000 字短篇或平台强限制时，爽文、打脸、系统流等高信息密度题材才可降至 ≥ 500 字/节（见 genre-writing-formulas.md 各题材速查表），但不得低于 500 字。
-写完每节后必须统计字数。**仅在默认初稿生成阶段**，不足 1600 字（短篇例外模式不足 500 字）的节不得跳过，必须回到大纲补充缺失的行动、反制、代价或结果后再写下一节。初稿完成后总字数必须为 40000-45000 字；单节达标不能替代总字数验收，超过 45000 字时必须压缩冗余段落，除非用户明确要求更长。审后修复阶段只记录实际字数，不因低于 30000 字或未回到初稿目标自动扩写。
 **字数统计必须跨平台可执行：优先使用 Python 字符统计**：`for PYBIN in python3 python py; do "$PYBIN" -c "" 2>/dev/null && break; done; "$PYBIN" -c "from pathlib import Path; print(len(Path('文件路径').read_text(encoding='utf-8')))"`。**不要直接调 `python3`**，Windows 上 `python3` 会落到 Microsoft Store 占位程序、以 exit 49 静默失败；上面的探测会按 `python3→python→py` 选出真正可用的解释器。Windows / DeepSeek / Claude Code 组合下不要让模型自行估算字数；`wc -m` 仅作为 macOS/Linux 备选，禁止使用 `wc -c`（字节数）。如果当前 agent/工具环境没有 Bash/Python 权限，必须明确声明“未完成机器字数验证”，并按行数速算作为临时估计，不得声称已通过字数硬验证。
 **⚠️ “字数不足 = 章节未完成”只适用于初稿生成阶段。** 审后修复、去 AI 味、按审查报告局部改写时，不得因为未达初稿节长或总字数目标就继续扩写；除非本轮审查问题本身明确指向“该节信息缺失/平台硬门槛未达/用户明确要求补字数”。
 
@@ -372,8 +367,7 @@ novels/
    - **禁止凑字**：每个添加必须推动情绪/铺垫/代入感，不得灌水。禁止用"加感知层""加反应层"的方式在已有动作上叠加描写
 
 **节长验证（分批写作，每批写完后执行）**：
-分批写作：每次输出 2-3 节（2-3 节约为 Claude 单次输出的最佳叙事窗口，过少浪费上下文，过多降低单节质量），写完后统一检查本批所有节的字数。
-如果任何一节 < 1600 字（用户明确切回短篇例外模式时 < 500 字）→ 仅初稿阶段回到大纲补足行动、反制、代价或结果后再写下一批；审后修复阶段不得仅因这里未达标就继续扩写。
+逐节写作：每次子代理仅写一节，写完后立即检查该节的字数、格式和完整性；只有通过验收后才能派发下一节。
 禁止跳过未达标的小节。
 
 > 批量验证更高效：一次性输出多节能让 AI 保持叙事连贯性，
@@ -467,8 +461,6 @@ novels/
 
 ### Phase 3 完成门槛（进入 Phase 4 前必须通过）
 
-- [ ] 初稿阶段：总字数 40000-45000；审后净稿只记录实际字数，不因低于 30000 或未回到初稿目标自动扩写（优先用 Python 字符统计验证，兼容 Windows 和中文字符计数；用户明确短篇模式除外）
-- [ ] 初稿阶段：默认 20 节，单节目标 1900-2300 字、硬下限 1600 字；用户明确切回短篇模式时，才可按题材降至 ≥500 字
 - [ ] 节数 = 小节大纲规划节数（不得合并/省略）
 - [ ] 身体部位同一词全文 ≤ 5 次
 - [ ] 「像」≤ 10 处
@@ -504,7 +496,6 @@ novels/
 
 ## 流程衔接
 
-**流水线：** 短篇/中篇（默认初稿约 42000 字，40000-45000 字古代优先、少量民国背景女频虐渣爽文）
 **位置：** 写作（第 3/3 步）
 
 | 时机 | 跳转到 | 命令 |
@@ -550,7 +541,7 @@ novels/
 | [references/character-relations.md](references/character-relations.md) | 人物关系设计 |
 | [references/dialogue-mastery.md](references/dialogue-mastery.md) | 写对话时 |
 | [references/opening-design.md](references/opening-design.md) | 设计开头时（短篇用法：「前3章」读作开篇首节~前1/3，七步法按目标字数等比缩放） |
-| [references/genre-catalog.md](references/genre-catalog.md) | 题材框架 |
+| [references/genre-catalog.md](references/genre-catalog.md) | 女频复仇固定结构总表（五段式、双发动机、20 节、钩子、反杀与结局） |
 | [references/genre-core-mechanics.md](references/genre-core-mechanics.md) | 核心梗设计 |
 | [references/genre-readers.md](references/genre-readers.md) | 读者心理 |
 | [references/state-tracking.md](references/state-tracking.md) | 状态追踪协议（Phase 3 写前准备参考） |
@@ -569,7 +560,8 @@ novels/
 | 钩子 | **`references/hooks-chapter.md`**（章节/开篇钩子类型） | `references/hooks-paragraph.md`（段落钩子）· `references/hooks-suspense.md`（悬念设计） |
 | 女频写作 | **`references/female-audience-writing.md`**（核心原则 / 文案结构体系 / 感情线写法深化） | `references/genre-writing-techniques.md`（女频读者心理与写作技法 / 感情线四阶段推进法）· `references/genre-readers.md`（读者心理） |
 | 古代/民国女频虐渣爽文 | **`references/corpus-19-structure-profile.md`**（双发动机 / 对抗升级 / 新秩序攻防 / 20 节骨架） | `references/female-revenge-longform-pipeline.md`（选题矩阵 / 5 段式 / 背叛反杀匹配 / 火葬场）· `references/female-short-pipeline-formula.md`（快速钩子与爽点组合）· `references/female-audience-writing.md` |
-| 题材公式 | **`references/genre-writing-formulas.md`**（各题材创作公式速查） | `references/genre-catalog.md`（题材框架）· `references/genre-core-mechanics.md`（核心梗设计） |
+| 题材公式 | **`references/genre-writing-formulas.md`**（各题材创作公式速查） | `references/genre-core-mechanics.md`（核心梗设计） |
+| 女频复仇长篇结构 | **`references/genre-catalog.md`**（五段式 / 双发动机 / 20 节 / 钩子 / 反杀与结局） | `references/corpus-19-structure-profile.md`（结构依据与完整节点）· `references/female-revenge-longform-pipeline.md`（反杀与火葬场细化） |
 | 开头 | **`references/opening-design.md`**（黄金一章 / 三大基点 / 题材开头模板；短篇：「前3章」读作开篇首节~前1/3、七步法按目标字数等比缩放） | `references/hooks-chapter.md`（开篇钩子类型） |
 | 格式与节奏 | **`references/format-and-structure.md`**（正文格式硬规范） | `references/writing-craft.md`（三维度揉进）· `references/writing-workflow.md`（设计/精修工作流） |
 | 对话 | **`references/dialogue-mastery.md`**（对话技法主文件：差异化/潜台词/对话节奏） | `references/writing-craft.md`（对话权力博弈的结构化用法） |
