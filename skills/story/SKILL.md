@@ -16,6 +16,7 @@ description: |
 |---|---|---|
 | 写长篇 | 开书、写大纲、长篇、连载 | `/story-long-write` |
 | 写短篇 | 短篇、盐言、一万字 | `/story-short-write` |
+| 女频虐渣爽文 | 女频虐渣、古言复仇、追妻火葬场、火葬场爽文 | `/story-female-revenge-write` |
 | 长篇拆文 | 拆文、分析这本书、黄金三章 | `/story-long-analyze` |
 | 短篇拆文 | 拆短篇、分析这个故事 | `/story-short-analyze` |
 | 长篇扫榜 | 长篇排行、什么火、起点/番茄/晋江 | `/story-long-scan` |

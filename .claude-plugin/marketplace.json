@@ -79,6 +79,16 @@
       "skills": ["./skills/story-short-write"]
     },
     {
+      "name": "story-female-revenge-write",
+      "description": "女频虐渣爽文写作。自动构思古代或民国背景的复仇、反杀与追妻火葬场中篇故事，支持 OpenClaw 子代理分批落盘。",
+      "source": "./",
+      "strict": false,
+      "version": "1.0.0",
+      "category": "novel-writing",
+      "keywords": ["female", "revenge", "ancient", "fire-chase", "爽文", "虐渣", "火葬场", "古言", "chinese"],
+      "skills": ["./skills/story-female-revenge-write"]
+    },
+    {
       "name": "story-deslop",
       "description": "网文去AI味。检测并清除文本中的AI写作痕迹，让文字回归自然。覆盖禁用词替换、句式去套路、心理外化、节奏打碎。",
       "source": "./",

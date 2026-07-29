@@ -1,0 +1,4 @@
+interface:
+  display_name: "女频虐渣爽文写作"
+  short_description: "古言民国女频虐渣复仇追妻火葬场中篇自动写作技能工具"
+  default_prompt: "使用 $story-female-revenge-write 写一篇女频虐渣爽文。"
